@@ -17,7 +17,7 @@ pipeline{
         }
     }   // dependecies scanning
         stage('dependecies scanning'){
-            parllel{
+            parallel{
                 stage(' scanne dependencies avec npm audit'){
                     steps{
                         dir('app'){
