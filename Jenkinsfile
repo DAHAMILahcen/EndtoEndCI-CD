@@ -15,7 +15,7 @@ pipeline{
                 }
             }
         }
-    }   // dependecies scanning
+       // dependecies scanning
         stage('dependecies scanning'){
             parallel{
                 stage(' scanne dependencies avec npm audit'){
@@ -42,6 +42,7 @@ pipeline{
                 }
                 }
                 }
+    }
                     
     // post build
     post{
