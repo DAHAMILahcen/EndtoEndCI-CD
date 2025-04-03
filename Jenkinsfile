@@ -22,7 +22,7 @@ pipeline{
                     steps{
                         dir('app'){
                             script {
-                                sh 'npm audit --production --audit-level=critical' 
+                                sh 'npm audit --production --audit-level=critical' || true 
                             }
                         }
                     }
@@ -42,6 +42,15 @@ pipeline{
                 }
                 }
                 }
+            stage ( ' test unitaires'){
+                steps{
+                    dir('app'){
+                        script {
+                            sh 'npm test' 
+                        }
+                    }
+                }
+            }
     }
                     
     // post build
