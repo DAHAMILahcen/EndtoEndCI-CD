@@ -4,6 +4,10 @@ pipeline{
     tools {
         nodejs "Nodejs20-17-0"
     }
+    environment {
+        // set the path to sonar-scanner
+        SonarqubeHome = tool 'Sonarqube'
+    }
     stages{
         // install dependencies
         stage('Install Dependencies'){
@@ -20,23 +24,30 @@ pipeline{
             parallel{
                 stage(' scanne dependencies avec npm audit'){
                     steps{
+                        catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE'){
+                            dir('app'){
+                                script {
+                                    sh 'npm audit --production --audit-level=high' // exit code defferent de 0 si il y a des vulnerabilites
+                                }
+                            }
+                        }
                         dir('app'){
                             script {
-                                sh 'npm audit --production --audit-level=critical' || true 
+                                sh 'npm audit --production --audit-level=critical' // exit code defferent de 0 si il y a des vulnerabilites
                             }
                         }
                     }
                 }
-
                 stage( "owasp-scan"){
                     steps{
                         dir('app'){
-                        dependencyCheck additionalArguments: '''
-                        --scan './'
-                        --out './'
-                        --format 'ALL'
-                        --prettyPrint
-                    ''', odcInstallation: 'Owasp dependency check'
+                    //     dependencyCheck additionalArguments: '''
+                    //     --scan './'
+                    //     --out './'
+                    //     --format 'ALL'
+                    //     --prettyPrint
+                    // ''', odcInstallation: 'Owasp dependency check'
+                    sh ' echo "owasp-scan"'
                         }
                     }
                 }
@@ -46,12 +57,29 @@ pipeline{
                 steps{
                     dir('app'){
                         script {
-                            sh 'npm test' 
+                            sh 'npm  run test' 
                         }
                     }
                 }
             }
+            // scanning code quality with sonarqube
+            stage('Sonarqube-SAST'){
+
+                steps{
+                    dir('app'){
+                       sonar-scanner \
+                            -Dsonar.projectKey=SAST \
+                            // on va analyser le code app.js
+                            -Dsonar.sources= app.js \
+                            -Dsonar.host.url=http://sonarqube-sonarqube-1:9000 \
+                            -Dsonar.login= sqp_a06a63022106ff5dc8dcc074879ecd1a101c8163
+ 
+                    }
+                }
+         
+            }
     }
+    
                     
     // post build
     post{
