@@ -87,6 +87,19 @@ pipeline{
                     }
                 }
             }
+            // stage (' scanne docker image'){
+            //     steps{
+            //         dir('app'){
+            //             script{
+            //                 def commitid = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
+            //                 def imageName = "dahami03/app:${commitid}"
+            //                 sh '''
+            //                 docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v $(pwd):/src --network host owasp/zap2docker-stable zap-baseline.py -t http://localhost:3000 -r zap_report.html
+            //                 '''
+            //             }
+            //         }
+            //     }
+            // }
             stage('push docker image'){
                 steps{
                     script{
