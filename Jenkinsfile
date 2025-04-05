@@ -7,6 +7,7 @@ pipeline{
     environment {
         // set the path to sonar-scanner
         SonarqubeHome = tool 'Sonarqube'
+        Docker_Token = credentials('docker-token')
     }
     stages{
         // install dependencies
@@ -68,6 +69,31 @@ pipeline{
                             -Dsonar.sources=app.js \
                             -Dsonar.host.url=http://sonarqube-sonarqube-1:9000 \
                             -Dsonar.login=sqp_a06a63022106ff5dc8dcc074879ecd1a101c8163
+                        '''
+                    }
+                }
+            stage('build docker image'){
+                steps{
+                    sh ' docker --version'
+                    dir('app'){
+                        script{
+                            def commitid = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
+                            def imageName = "dahami03/app:${commitid}"
+                            sh '''
+                              docker build -t ${imageName} .
+                              '''
+                        }
+                    }
+                }
+            }
+            stage('push docker image'){
+                steps{
+                    script{
+                        def commitid = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
+                        def imageName = "dahami03/app:${commitid}"
+                        sh '''
+                            docker login -u dahami03 -p $Docker_Token
+                            docker push ${imageName}
                         '''
                     }
                 }
