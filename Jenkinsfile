@@ -7,6 +7,7 @@ pipeline{
     environment {
         // set the path to sonar-scanner
         SonarqubeHome = tool 'Sonarqube'
+        //docker token
         Docker_Token = credentials('docker-token')
     }
     stages{
@@ -72,6 +73,7 @@ pipeline{
                         '''
                     }
                 }
+            }
             stage('build docker image'){
                 steps{
                     sh ' docker --version'
