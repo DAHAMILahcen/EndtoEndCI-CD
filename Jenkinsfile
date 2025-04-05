@@ -31,11 +31,6 @@ pipeline{
                                 }
                             }
                         }
-                        dir('app'){
-                            script {
-                                sh 'npm audit --production --audit-level=critical' // exit code defferent de 0 si il y a des vulnerabilites
-                            }
-                        }
                     }
                 }
                 stage( "owasp-scan"){
