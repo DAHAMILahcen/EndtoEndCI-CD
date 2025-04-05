@@ -65,9 +65,9 @@ pipeline{
                         sh '''
                        $SonarqubeHome/bin/sonar-scanner \
                             -Dsonar.projectKey=SAST \
-                            -Dsonar.sources= app.js \
+                            -Dsonar.sources=app.js \
                             -Dsonar.host.url=http://sonarqube-sonarqube-1:9000 \
-                            -Dsonar.login= sqp_a06a63022106ff5dc8dcc074879ecd1a101c8163
+                            -Dsonar.login=sqp_a06a63022106ff5dc8dcc074879ecd1a101c8163
                         '''
                     }
                 }
