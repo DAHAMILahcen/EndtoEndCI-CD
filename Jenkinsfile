@@ -81,9 +81,8 @@ pipeline{
                         script{
                             def commitid = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
                             def imageName = "dahami03/app:${commitid}"
-                            sh '''
-                              docker build -t ${imageName} .
-                              '''
+                            sh  " docker build -t ${imageName} . "
+                            
                         }
                     }
                 }
@@ -93,10 +92,9 @@ pipeline{
                     script{
                         def commitid = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
                         def imageName = "dahami03/app:${commitid}"
-                        sh '''
-                            docker login -u dahami03 -p $Docker_Token
-                            docker push ${imageName}
-                        '''
+                        sh " docker login -u dahami03 -p $Docker_Token "
+                        sh    "docker push ${imageName}"
+                        
                     }
                 }
          
