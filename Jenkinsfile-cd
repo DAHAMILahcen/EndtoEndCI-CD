@@ -1,0 +1,16 @@
+pipeline{
+    any agent
+    stages{
+        stage('deploy'){
+            steps{
+                script {
+                    // docker build and push
+                    def commitid = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
+                    def imageName = "dahami03/app:${commitid}"
+                    sh ' docker pull ${imageName} '
+                    sh ' docker run -d -p 3000:3000 ${imageName}'
+                }
+            }
+        }
+    }
+}
