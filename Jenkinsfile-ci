@@ -8,7 +8,7 @@ pipeline{
         // set the path to sonar-scanner
         SonarqubeHome = tool 'Sonarqube'
         //docker credentials
-        DOCKER_CREDENTIALS =credentials('docker-creds')
+        Docker_token = credentials('docker-token')
     }
     stages{
         // install dependencies
@@ -105,9 +105,8 @@ pipeline{
         script {
             def commitid = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
             def imageName = "dahami03/app:${commitid}"
-
-            docker.withRegistry('https://registry.hub.docker.com', DOCKER_CREDENTIALS) {
-                sh "docker push ${imageName}"
+            sh "docker login -u dahami03 -p ${Docker_token}"
+            sh " docker push ${imageName}"
             }
         }
     }
