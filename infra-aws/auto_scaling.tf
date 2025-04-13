@@ -8,7 +8,7 @@ resource "aws_launch_template" "launch_template" {
   associate_public_ip_address = false
   security_groups             = [aws_security_group.template_sg.id] 
     }
-  user_data = file("docker.sh")
+  user_data = base64encode(file("docker.sh"))
   lifecycle {
     create_before_destroy = true
   }
@@ -32,5 +32,5 @@ resource "aws_autoscaling_group" "my_asg" {
 # create a pair of key for instances
 resource "aws_key_pair" "key_pair2"{
   key_name   = "key_pair"
-  public_key = file("~/.ssh/my-ec2-key.pub") 
+  public_key = file("~/.ssh/ec2.pub") 
 }

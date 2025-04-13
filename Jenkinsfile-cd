@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        USER = 'ec2-user'  
+        USER = 'ubuntu'  
         BASTION_IP = credentials('bastion-ip')  
         PRIVATE_IP1 = credentials('private-ip1') 
         PRIVATE_IP2 = credentials('private-ip2')  
