@@ -2,10 +2,10 @@ pipeline {
     agent any
 
     environment {
-        USER = 'ubuntu'
-        BASTION_IP = credentials('bastion-ip')
-        PRIVATE_IP1 = credentials('private-ip1')
-        PRIVATE_IP2 = credentials('private-ip2')
+        USER = 'ec2-user'  
+        BASTION_IP = credentials('bastion-ip')  
+        PRIVATE_IP1 = credentials('private-ip1') 
+        PRIVATE_IP2 = credentials('private-ip2')  
     }
 
     stages {
@@ -20,25 +20,17 @@ pipeline {
                 stage('deploy to first-instance') {
                     steps {
                         withCredentials([
-                            string(credentialsId: 'private-key-1', variable: 'PRIVATE_KEY_1'),
-                            string(credentialsId: 'private-key-2', variable: 'PRIVATE_KEY_2')
+                            file(credentialsId: 'private-key-1', variable: 'PRIVATE_KEY_1'),
+                            file(credentialsId: 'private-key-2', variable: 'PRIVATE_KEY_2')   
                         ]) {
                             sh '''
-                                set -e
-
-                                echo "$PRIVATE_KEY_1" > bastion_key.pem
-                                echo "$PRIVATE_KEY_2" > instance_key.pem
-                                chmod 600 bastion_key.pem instance_key.pem
-
                                 eval $(ssh-agent -s)
-                                ssh-add bastion_key.pem
-                                ssh-add instance_key.pem
-
+                                ssh-add ${PRIVATE_KEY_1}
+                                ssh -o StrictHostKeyChecking=no ${USER}@${BASTION_IP} 
+                                echo Connexion au bastion réussie !
+                                ssh-add ${PRIVATE_KEY_2}
                                 ssh -o StrictHostKeyChecking=no -J ${USER}@${BASTION_IP} ${USER}@${PRIVATE_IP1} \
-                                  "echo ✅ Déploiement sur la première instance privée réussi ! && hostname"
-
-                                ssh-agent -k
-                                rm bastion_key.pem instance_key.pem
+                                    "echo ✅ Déploiement sur la première instance privée réussi ! && hostname"
                             '''
                         }
                     }
@@ -47,25 +39,17 @@ pipeline {
                 stage('deploy to second-instance') {
                     steps {
                         withCredentials([
-                            string(credentialsId: 'private-key-1', variable: 'PRIVATE_KEY_1'),
-                            string(credentialsId: 'private-key-2', variable: 'PRIVATE_KEY_2')
+                            file(credentialsId: 'private-key-1', variable: 'PRIVATE_KEY_1'),
+                            file(credentialsId: 'private-key-2', variable: 'PRIVATE_KEY_2')   
                         ]) {
                             sh '''
-                                set -e
-
-                                echo "$PRIVATE_KEY_1" > bastion_key.pem
-                                echo "$PRIVATE_KEY_2" > instance_key.pem
-                                chmod 600 bastion_key.pem instance_key.pem
-
                                 eval $(ssh-agent -s)
-                                ssh-add bastion_key.pem
-                                ssh-add instance_key.pem
-
+                                ssh-add ${PRIVATE_KEY_1}                            
+                                ssh -o StrictHostKeyChecking=no ${USER}@${BASTION_IP}
+                                echo Connexion au bastion réussie !                     
+                                ssh-add ${PRIVATE_KEY_2}
                                 ssh -o StrictHostKeyChecking=no -J ${USER}@${BASTION_IP} ${USER}@${PRIVATE_IP2} \
-                                  "echo ✅ Déploiement sur la deuxième instance privée réussi ! && hostname"
-
-                                ssh-agent -k
-                                rm bastion_key.pem instance_key.pem
+                                    "echo ✅ Déploiement sur la deuxième instance privée réussi ! && hostname"
                             '''
                         }
                     }
@@ -73,7 +57,6 @@ pipeline {
             }
         }
     }
-
     post {
         success {
             echo 'the pipeline is successful.'
