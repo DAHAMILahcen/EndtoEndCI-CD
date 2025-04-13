@@ -5,7 +5,8 @@ pipeline {
         USER = 'ubuntu'  
         BASTION_IP = credentials('bastion-ip')  
         PRIVATE_IP1 = credentials('private-ip1') 
-        PRIVATE_IP2 = credentials('private-ip2')  
+        PRIVATE_IP2 = credentials('private-ip2')
+        
     }
 
     stages {
@@ -30,7 +31,8 @@ pipeline {
                                 echo Connexion au bastion réussie !
                                 ssh-add ${PRIVATE_KEY_2}
                                 ssh -o StrictHostKeyChecking=no -J ${USER}@3.80.9.62 ${USER}@192.168.1.211 \
-                                    "echo ✅ Déploiement sur la première instance privée réussi ! && hostname"
+                                    "docker pull dahami03/app:353dc7b && docker run -d --name app -p 80:3000 dahami03/app:353dc7b  && \
+                                    echo ✅ Déploiement sur la première instance privée réussi ! && hostname"
                             '''
                         }
                     }
@@ -49,7 +51,8 @@ pipeline {
                                 echo Connexion au bastion réussie !                     
                                 ssh-add ${PRIVATE_KEY_2}
                                 ssh -o StrictHostKeyChecking=no -J ${USER}@3.80.9.62 ${USER}@192.168.2.150 \
-                                    "echo ✅ Déploiement sur la deuxième instance privée réussi ! && hostname"
+                                    "docker pull dahami03/app:353dc7b && docker run -d --name app -p 80:3000 dahami03/app:353dc7b  && \
+                                    echo ✅ Déploiement sur la première instance privée réussi ! && hostname"
                             '''
                         }
                     }
