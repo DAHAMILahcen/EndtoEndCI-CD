@@ -5,7 +5,7 @@ Ce projet met en œuvre une pipeline CI/CD pour le déploiement d’une applicat
 
 ##Overview:
 
-![Logo de mon projet](.images/Capture%20d'écran%202025-04-05%20014518.png)
+![Logo de mon projet](./images/Untitled-2024-12-13-1430.excalidraw.png)
 
 ##Fonctionnalités:
 
