@@ -38,12 +38,12 @@ pipeline{
                 stage( "owasp-scan"){
                     steps{
                         dir('app'){
-                    //     dependencyCheck additionalArguments: '''
-                    //     --scan './'
-                    //     --out './'
-                    //     --format 'ALL'
-                    //     --prettyPrint
-                    // ''', odcInstallation: 'Owasp dependency check'
+                        dependencyCheck additionalArguments: '''
+                        --scan './'
+                        --out './'
+                        --format 'ALL'
+                        --prettyPrint
+                    ''', odcInstallation: 'Owasp dependency check'
                     sh ' echo "owasp-scan"'
                         }
                     }
@@ -59,21 +59,21 @@ pipeline{
                     }
                 }
             }
-            // scanning code quality with sonarqube
-            // stage('Sonarqube-SAST'){
+            scanning code quality with sonarqube
+            stage('Sonarqube-SAST'){
 
-            //     steps{
-            //         dir('app'){
-            //             sh '''
-            //            $SonarqubeHome/bin/sonar-scanner \
-            //                 -Dsonar.projectKey=SAST \
-            //                 -Dsonar.sources=app.js \
-            //                 -Dsonar.host.url=http://sonarqube-sonarqube-1:9000 \
-            //                 -Dsonar.login=sqp_a06a63022106ff5dc8dcc074879ecd1a101c8163
-            //             '''
-            //         }
-            //     }
-            // }
+                steps{
+                    dir('app'){
+                        sh '''
+                       $SonarqubeHome/bin/sonar-scanner \
+                            -Dsonar.projectKey=SAST \
+                            -Dsonar.sources=app.js \
+                            -Dsonar.host.url=http://sonarqube-sonarqube-1:9000 \
+                            -Dsonar.login=sqp_a06a63022106ff5dc8dcc074879ecd1a101c8163
+                        '''
+                    }
+                }
+            }
             stage('build docker image'){
                 steps{
                     sh ' docker --version'

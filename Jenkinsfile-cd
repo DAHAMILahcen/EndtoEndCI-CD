@@ -6,7 +6,7 @@ pipeline {
         BASTION_IP = credentials('bastion-ip')  
         PRIVATE_IP1 = credentials('private-ip1') 
         PRIVATE_IP2 = credentials('private-ip2')
-        
+        IMAGENAME = 'dahami03/app'
     }
 
     stages {
@@ -23,17 +23,19 @@ pipeline {
                         withCredentials([
                             file(credentialsId: 'private-key-1', variable: 'PRIVATE_KEY_1'),
                             file(credentialsId: 'private-key-2', variable: 'PRIVATE_KEY_2')   
-                        ]) {
-                            sh '''
+                        ]){
+                        script{
+                            def commitid = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
+                            sh """
                                 eval $(ssh-agent -s)
                                 ssh-add ${PRIVATE_KEY_1}
-                                ssh -o StrictHostKeyChecking=no ${USER}@3.80.9.62
-                                echo Connexion au bastion réussie !
+                                ssh -o StrictHostKeyChecking=no ${USER}@${BASTION_IP}
                                 ssh-add ${PRIVATE_KEY_2}
-                                ssh -o StrictHostKeyChecking=no -J ${USER}@3.80.9.62 ${USER}@192.168.1.211 \
-                                    "docker pull dahami03/app:353dc7b && docker run -d --name app -p 80:3000 dahami03/app:353dc7b  && \
-                                    echo ✅ Déploiement sur la première instance privée réussi ! && hostname"
-                            '''
+                                ssh -o StrictHostKeyChecking=no -J ${USER}@${BASTION_IP} ${USER}@${PRIVATE_IP1}\
+                                "docker pull ${IMAGENAME}:${commitid} && docker run -d --name app -p 80:3000 ${IMAGENAME}:${commitid}"
+                            """
+                        }
+                        }
                         }
                     }
                 }
@@ -43,17 +45,17 @@ pipeline {
                         withCredentials([
                             file(credentialsId: 'private-key-1', variable: 'PRIVATE_KEY_1'),
                             file(credentialsId: 'private-key-2', variable: 'PRIVATE_KEY_2')   
-                        ]) {
-                            sh '''
+                        ]){
+                        script{  
+                            def commitid = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
+                            sh """
                                 eval $(ssh-agent -s)
                                 ssh-add ${PRIVATE_KEY_1}                            
-                                ssh -o StrictHostKeyChecking=no ${USER}@3.80.9.62
-                                echo Connexion au bastion réussie !                     
+                                ssh -o StrictHostKeyChecking=no ${USER}@${BASTION_IP}                   
                                 ssh-add ${PRIVATE_KEY_2}
-                                ssh -o StrictHostKeyChecking=no -J ${USER}@3.80.9.62 ${USER}@192.168.2.150 \
-                                    "docker pull dahami03/app:353dc7b && docker run -d --name app -p 80:3000 dahami03/app:353dc7b  && \
-                                    echo ✅ Déploiement sur la première instance privée réussi ! && hostname"
-                            '''
+                                ssh -o StrictHostKeyChecking=no -J ${USER}@${BASTION_IP} ${USER}@${PRIVATE_IP2} \
+                                "docker pull $IMAGENAME:${commitid} && docker run -d --name app -p 80:3000 $IMAGENAME:${commitid}"
+                            """
                         }
                     }
                 }
